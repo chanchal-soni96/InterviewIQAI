@@ -19,8 +19,6 @@ const App = () => {
           dispatch(setUserData(result.data))
           } catch (error) {
         console.log(error);
-        // ✅ Only set null if user is actually unauthorized
-  // if (error.response && error.response.status === 401) {
         dispatch(setUserData(null))
         
       // }
