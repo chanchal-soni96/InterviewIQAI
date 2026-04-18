@@ -1,12 +1,13 @@
-export const askAi = async (message) => {
+import axios from "axios";
+export const askAi = async (messages) => {
   try {
-    if(!message || !Array.isArray(message) || message.length === 0) {
+    if(!messages || !Array.isArray(messages) || messages.length === 0) {
       throw new Error("Messages array is empty.");
     }
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openai/gpt-40-mini",
+        model: "openai/gpt-4o-mini",
         messages: messages
       },
       {
@@ -20,7 +21,7 @@ export const askAi = async (message) => {
         if(!content || !content.trim()){
           throw new Error("AI returned empty response.");
         }
-        return Content
+        return content
   } catch (error) {
     console.log("OpenRouter Error:", error.response?.data || error.message);
     throw new Error("OpenRouter API Error");
