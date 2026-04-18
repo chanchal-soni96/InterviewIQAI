@@ -47,8 +47,11 @@ export const analyzeResume = async (req,res) => {
             }
         ];
         const aiResponse = await askAi(messages)
-        const parsad = JSON.parse(aiResponse);
+         const parsed = JSON.parse(aiResponse);
+    
         fs.unlinkSync(filepath)
+
+        
 
         res.json({
             role: parsed.role,
@@ -70,3 +73,6 @@ export const analyzeResume = async (req,res) => {
         
     }
 };
+
+
+
