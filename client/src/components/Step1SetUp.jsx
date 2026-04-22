@@ -9,9 +9,13 @@ import {
 } from "react-icons/fa";
 import { useState } from "react";
 import axios from "axios";
-import { ServerUrl } from "../App"; 
+import { ServerUrl } from "../App";
+import { useDispatch, useSelector } from "react-redux"; 
+import { setUserData } from "../redux/userSlice";
 
 const Step1SetUp = ({ onStart }) => {
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.user.userData);
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
   const [mode, setMode] = useState("Technical");
@@ -30,6 +34,7 @@ const Step1SetUp = ({ onStart }) => {
     formdata.append("resume",resumeFile)
 
     try {
+   
       const result = await axios.post(ServerUrl + "/api/interview/resume", formdata, {withCredentials:true})
       console.log(result.data);
 
@@ -45,6 +50,25 @@ const Step1SetUp = ({ onStart }) => {
      } finally {
     setAnalyzing(false);
       
+    }
+  }
+
+  const handleStart = async () =>{
+    setLoading(true)
+    try {
+      const result = await axios.post(ServerUrl + "/api/interview/generate-questions",
+        {role, experience, mode, resumeText, projects, skills}, {withCredentials:true})
+        console.log(result.data);
+        if(userData){
+          dispatch(setUserData({...userData, credits:result.data.creditsLeft}))
+        }
+        setLoading(false)
+        onStart(result.data)
+        
+    } catch (error) {
+       console.log(error);
+       setLoading(false)
+             
     }
   }
   return (
@@ -203,12 +227,13 @@ const Step1SetUp = ({ onStart }) => {
               </motion.div>
             )}
             <motion.button 
-            disabled={!role || !experience}
+            onClick={handleStart}
+            disabled={!role || !experience || loading}
             whileHover={{scale:1.03}}
             whileTap={{scale:0.95}}
             className="w-full disabled:bg-gray-600 bg-green-600 hover:bg-green-700 text-white py-3
             rounded-full text-lg font-semibold transition duration-300 shadow-md">
-            Start Interview 
+            {loading ? "String...":"Start Interview "}
             </motion.button>
           </div>
         </motion.div>
