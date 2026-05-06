@@ -48,9 +48,14 @@ export const analyzeResume = async (req,res) => {
                 content: resumeText
             }
         ];
-        const aiResponse = await askAi(messages)
-         const parsed = JSON.parse(aiResponse);
-    
+        const aiResponse = await askAi(messages);
+
+        const cleanResponse = aiResponse
+  .replace(/```json/g, "")  //Add Here
+  .replace(/```/g, "")
+  .trim();
+
+const parsed = JSON.parse(cleanResponse);   
         fs.unlinkSync(filepath)
 
         
@@ -200,7 +205,7 @@ export const generateQuestion = async (req, res) => {
 
 export const submitAnswer = async (req, res) => {
     try {
-        const {interviewId, questionIndex, answer, timetaken} = req.body
+        const {interviewId, questionIndex, answer, timeTaken} = req.body
         const interview = await Interview.findById(interviewId)
         const question = interview.questions[questionIndex]
 
@@ -217,7 +222,7 @@ export const submitAnswer = async (req, res) => {
             });
         }
         //If time exceeded
-        if(timetaken > question.timeLimit){
+        if(timeTaken > question.timeLimit){
             question.score = 0;
             question.feedback = "The limit exceeded. Answer not evaluated.";
             question.answer = answer;
@@ -277,14 +282,11 @@ export const submitAnswer = async (req, res) => {
                 Answer: ${answer}`
             }
  ];
- const aiResponse = await askAi(messages)
-
- //const parsed = JSON.parse(aiResponse);
-
-//  const cleanResponse = aiResponse
-//   .replace(/```json/g, "")
-//   .replace(/```/g, "")
-//   .trim();
+ const aiResponse = await askAi(messages);
+ const cleanResponse = aiResponse
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
 
 const parsed = JSON.parse(cleanResponse);
 
